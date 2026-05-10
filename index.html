@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Задание 2 — HTTP запросы</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+    line-height: 1.6;
+}
+h1 {
+    text-align: center;
+}
+h2 {
+    margin-top: 40px;
+}
+pre {
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+img {
+    max-width: 100%;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
+.section {
+    margin-bottom: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<hr>
+<div class="section">
+
+<p> подключаемся к удаленному серверу с помощью ssh. c помощью команды cd переходим в папку. команда git clone скачиает проект с GitHub, создает папку и подключается ее к GitHub. команда git push загружает изменения на GitHub, а git pull скачивает обновления с GitHub на сервер.  
+    команда git remote -v показывает удаленный репозиторий привязан мой проект, откуда скачиваются изменеия и отправляет изменения. origin - это GitHub и используется для получения изменений и отправки изменений. fetch - для получения изменений, push-для отправки изменений.
+    для выполнения задания мы подключаемся к ssh, переходим в папку cd www, после этого перещли в папку проекта cd task2
+</p>
+
+<img src="clone.png" alt="GET main">
+</div>
+
+
+<div class="section">
+<h2>1. GET главной страницы (HTTP/1.0)</h2>
+
+<p> Здесь мы запрашиваем главную страницу сайта. Метод GET используется для получения данных с сервера. HTTP/1.0 — старая версия протокола. Host - Это имя сайта которому мы подключаемся 
+    telnet - это прошрамма для подключания к серверу вручную, localhost - это текущий компьютер, 80 - это порт HTTP
+</p>
+
+<pre>
+GET /task2/ HTTP/1.0
+Host: u82300.kubsu-dev.ru
+</pre>
+
+<p><strong>Ответ сервера:</strong> 200 OK</p>
+
+<img src="1.png" alt="GET main">
+</div>
+
+
+<div class="section">
+<h2>2. GET внутренней страницы (HTTP/1.1)</h2>
+
+<p> Я подключилась к веб‑серверу через telnet на порт 80. Затем вручную отправила HTTP‑запрос методом GET( это используется для получения данных с сервера, возвращает файл полностью) к файлу index.html, используя протокол HTTP/1.1 и указав заголовок Host. Сервер успешно обработал запрос и вернул ответ 200 OK, а также заголовки, содержащие информацию о типе и размере файла.
+    ETag: - это уникальный индефикатор версии файла. Content-Type: application/x-gzip - это означает, что файл - архив gzip
+</p>
+
+
+<pre>
+GET /task2/index.html HTTP/1.1
+Host: u82300.kubsu-dev.ru
+</pre>
+
+<img src="2.png" alt="GET inner">
+</div>
+
+
+<div class="section">
+<h2>3. Определение размера file.tar.gz</h2>
+
+<p>
+    Я использовала метод HEAD, чтобы получить только заголовки файла без его скачивания. В ответе сервера я получила заголовок Content-Length, который показывает размер файла в байтах. Размер файла file.tar.gz составляет 31 байт.
+</p>
+
+<pre>
+HEAD /task2/files/file.tar.gz HTTP/1.1
+Host: u82300.kubsu-dev.ru
+</pre>
+
+<p><strong>Размер файла:</strong> 31 байт</p>
+
+<img src="3.png" alt="File size">
+</div>
+
+
+<div class="section">
+<h2>4. Определение медиатипа image.png</h2>
+
+<p>Я использовала метод HEAD для получения заголовков файла image.png. В ответе сервера был получен заголовок Content-Type: image/png, который указывает на медиатип файла. Это означает, что ресурс является изображением формата PNG.</p>
+
+<pre>
+HEAD /task2/files/image.png HTTP/1.1
+Host: u82300.kubsu-dev.ru
+</pre>
+
+<p><strong>Content-Type:</strong> image/png</p>
+
+<img src="4.png" alt="MIME type">
+</div>
+
+
+<div class="section">
+<h2>5. Отправка POST запроса</h2>
+
+<p>Я использовала метод POST для отправки данных на сервер. index.php - это файл может обрабатывать отправленные данные. Content-Type - указывает тип передаваемых данных, он сообщает клиенту или серверу, как обрабатывать полученную информацию. Заголовок Content-Length указывает размер передаваемых данных. Тело запроса comment=hello, используем 13 потому что в comment=hello всего 13 символов. обязательно должна быть пустая стока между Content-Length и comment=hello. Сервер успешно обработал запрос и вернул ответ 200 OK.
+    Content-Type - это какой тип данных отправляет сервер, text/html- тип файла,charset=UTF-8 - это кодировка страницы, что позволяет корректно отображать символы разных языков 
+
+</p>
+
+<pre>
+POST /task2/index.php HTTP/1.1
+Host: u82300.kubsu-dev.ru
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 13
+
+comment=hello
+</pre>
+
+<p><strong>Ответ сервера:</strong> 200 OK</p>
+
+<img src="5.png" alt="POST request">
+</div>
+
+
+<div class="section">
+<h2>6. Получение первых байт файла</h2>
+
+<p>Я использовала метод GET с заголовком Range для получения части файла. Заголовок Range: bytes=0-99 указывает диапазон запрашиваемых байтов. Сервер вернул код 206 Partial Content, что означает частичную передачу файлов. В ответе содержится заголовок Content-Range, который показывает отправленный диапазон и общий размер файла.</p>
+
+<pre>
+GET /task2/files/file.tar.gz HTTP/1.1
+Host: u82300.kubsu-dev.ru
+Range: bytes=0-99
+</pre>
+
+
+<img src="6.png" alt="Range request">
+</div>
+
+
+<div class="section">
+<h2>7. Определение кодировки index.php</h2>
+
+<p>Я использовала метод HEAD для получения заголовков (HTTP ответа) ресурса index.php. В ответе сервера был получен заголовок Content-Type: text/html; charset=UTF-8. Параметр charset указывает кодировку страницы. В данном случае используется кодировка UTF-8.</p>
+
+<pre>
+HEAD /task2/index.php HTTP/1.1
+Host: u82300.kubsu-dev.ru
+</pre>
+
+<p><strong>Кодировка:</strong> UTF-8</p>
+
+<img src="7.png" alt="Charset">
+</div>
+
+<hr>
+
+
+
+</body>
+</html>
